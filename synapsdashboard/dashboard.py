@@ -6,7 +6,7 @@ import horizon
 class SynapsDashboard(horizon.Dashboard):
     name = _("Synaps")
     slug = "synapsdashboard"
-    panels = ('overview', 'projects', )  # Add your panels here.
+    panels = ('overview', 'alarms', 'metrics', 'projects', )  # Add your panels here.
     default_panel = 'overview'  # Specify the slug of the dashboard's default panel.
 
 
