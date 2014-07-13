@@ -26,8 +26,7 @@ from horizon.utils import filters
 class StatisticsTable(tables.DataTable):
     instance_name = tables.Column('name',
                                   link=("horizon:admin:instances:detail"))
-    instance_id = tables.Column('instance_name', 
-                                verbose_name="Instance ID")
+    instance_id = tables.Column('id', verbose_name="Instance ID", hidden=True)
     cpu_avg = tables.Column('cpu_avg', verbose_name="CPU Avg")
     cpu_min = tables.Column('cpu_min', verbose_name="CPU Min")
     cpu_max = tables.Column('cpu_max', verbose_name="CPU Max")
@@ -41,14 +40,16 @@ class StatisticsTable(tables.DataTable):
     netout_max = tables.Column('netout_max', verbose_name="Net Out Max")
     
     def get_object_id(self, datum):
-        return datum.get("id")    
+        return datum.get("id")
     
     class Meta:
         name = "statistics"
         verbose_name = _("Statistics")
 
 class HistoryTable(tables.DataTable):
-    timestamp = tables.Column('timestamp')
+    timestamp = tables.Column('timestamp',
+#                               filters=(filters.timesince_sortable, ),
+                              attrs={'data-type': 'timesince'})
     name = tables.Column('name')
     tem_type = tables.Column('tem_type', verbose_name="Type")
     summary = tables.Column('summary')

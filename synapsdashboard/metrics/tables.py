@@ -83,7 +83,9 @@ class MetricsTable(tables.DataTable):
     
     def get_object_id(self, datum):
         return (datum.name, datum.namespace, json.dumps(datum.dimensions))
-    
+
+    def get_marker(self):
+        return http.urlquote_plus(self.data.next_token)    
     
     class Meta:
         name = "metrics"

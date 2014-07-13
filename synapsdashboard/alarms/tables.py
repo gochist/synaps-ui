@@ -16,6 +16,7 @@
 
 from django.template.defaultfilters import title  # noqa
 from django.utils.translation import ugettext_lazy as _
+from django.utils import http
 
 import logging
 
@@ -50,7 +51,9 @@ class AlarmsTable(tables.DataTable):
     def get_object_id(self, datum):
         return datum.name
 
-    
+    def get_marker(self):
+        return http.urlquote_plus(self.data.next_token)
+        
     class Meta:
         name = "alarms"
         verbose_name = _("Alarms")

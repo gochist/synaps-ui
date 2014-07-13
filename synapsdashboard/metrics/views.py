@@ -11,8 +11,15 @@ class IndexView(tables.DataTableView):
     table_class = MetricsTable 
     template_name = 'synapsdashboard/metrics/index.html'
 
-
+    def has_more_data(self, table):
+        return self._more
+    
     def get_data(self):
         cw = synaps.get_cw_client(self.request)
-        metrics = cw.list_metrics()
+        marker = self.request.GET.get(MetricsTable._meta.pagination_param, 
+                                      None)
+        
+        metrics = cw.list_metrics(next_token=marker)
+        self._more = metrics.next_token
+        
         return metrics

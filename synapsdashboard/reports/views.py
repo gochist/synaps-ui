@@ -5,13 +5,13 @@ from horizon import exceptions
 from horizon import tables
 from openstack_dashboard import api
 from synapsdashboard.api import synaps
-from synapsdashboard.overview.tables import HistoryTable, StatisticsTable
+from synapsdashboard.reports.tables import HistoryTable, StatisticsTable
 from datetime import datetime, timedelta
 
 
 class IndexView(tables.MultiTableView):
     table_classes = (HistoryTable, StatisticsTable) 
-    template_name = 'synapsdashboard/overview/index.html'
+    template_name = 'synapsdashboard/reports/index.html'
 
     def get_statistics_data(self):
         cw = synaps.get_cw_client(self.request)
@@ -24,33 +24,30 @@ class IndexView(tables.MultiTableView):
         ret = []
         for s in servers:
             datum = {}
-            datum["id"] = getattr(s, "id") 
-            datum["name"] = getattr(s, "name") 
-            datum["instance_name"] = getattr(s, "OS-EXT-SRV-ATTR:instance_name")
+            datum["id"] = instance_id = getattr(s, "id") 
+            datum["name"] = getattr(s, "name")
+                        
             cpu_stats = cw.get_metric_statistics(period=60 * 60 * 24,
                               start_time=end_date,
                               end_time=end_date,
                               metric_name="CPUUtilization",
                               namespace="SPCS/NOVA",
                               statistics=["Average", "Minimum", "Maximum"],
-                              dimensions={"instanceId":
-                                          datum["instance_name"]})
+                              dimensions={"instanceId": instance_id})
             netin_stats = cw.get_metric_statistics(period=60 * 60 * 24,
                               start_time=end_date,
                               end_time=end_date,
                               metric_name="NetworkIn",
                               namespace="SPCS/NOVA",
                               statistics=["Average", "Minimum", "Maximum"],
-                              dimensions={"instanceId":
-                                          datum["instance_name"]})
+                              dimensions={"instanceId": instance_id})
             netout_stats = cw.get_metric_statistics(period=60 * 60 * 24,
                               start_time=end_date,
                               end_time=end_date,
                               metric_name="NetworkOut",
                               namespace="SPCS/NOVA",
                               statistics=["Average", "Minimum", "Maximum"],
-                              dimensions={"instanceId":
-                                          datum["instance_name"]})            
+                              dimensions={"instanceId": instance_id})            
             if cpu_stats:
                 datum["cpu_avg"] = cpu_stats[-1]["Average"]
                 datum["cpu_max"] = cpu_stats[-1]["Maximum"]
